@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+  <link href="./Libs/Tailwind.css" rel="stylesheet">
+  <link href="./Libs/aos.css" rel="stylesheet">
+  <style>
+    body { perspective: 1000px; }
+    #three-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      display: none;
+      transition: all 0.3s ease;
+    }
+    .popup.active {
+      display: block;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+      background-color: #4f46e5;
+      border-radius: 8px;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .button:hover {
+      background-color: #4338ca;
+      transform: scale(1.05);
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.5s forwards;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1, p {
+      color: white;
+      transition: transform 0.3s, color 0.3s;
+    }
+    h1:hover, p:hover {
+      color: #4f46e5;
+      transform: scale(1.05);
+    }
+    .hacker-text {
+      position: absolute;
+      top: -50px;
+      left: 0;
+      width: 100%;
+      height: 200%;
+      color: rgba(0, 255, 0, 0.5);
+      font-family: monospace;
+      font-size: 1.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+      animation: moveDown 10s linear infinite;
+    }
+    @keyframes moveDown {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(100%); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="overflow-hidden bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+
+  <div id="three-container" class="fixed inset-0 z-0"></div>
+
+  <div class="relative z-10 flex items-center justify-center h-screen">
+    <div class="container text-center" data-aos="zoom-in">
+      <h1 class="text-5xl font-bold" data-aos="fade-right">About Me</h1>
+      <p class="mt-4 text-lg" data-aos="fade-left">Age: 17</p>
+      <p class="mt-2 text-lg" data-aos="fade-left">Currently in my first year of college, studying Information Technology.</p>
+      <p class="mt-2 text-lg" data-aos="fade-left">Languages I’ve learned: Python, Lua, Small Basic, HTML, CSS.</p>
+      <p class="mt-2 text-lg" data-aos="fade-left">Currently learning: C++, C#, JavaScript.</p>
+      
+      <a href="https://github.com/Whitzzscott" target="_blank" class="button mt-8" data-aos="fade-up">
+        Check out my GitHub
+      </a>
+    </div>
+  </div>
+
+  <div id="popup" class="popup">
+    <div class="popup-header">
+      <h2 class="text-lg font-bold" id="popup-title"></h2>
+      <button id="close-popup" class="text-red-500">✖</button>
+    </div>
+    <p class="mt-2" id="popup-content"></p>
+  </div>
+
+  <div class="hacker-text"></div>
+
+  <script src="./Libs/reactdev.js"></script>
+  <script src="./Libs/React.js"></script>
+  <script src="./Libs/Babel.js"></script>
+  <script src="./Libs/Three.js"></script>
+  <script src="./Libs/aos.js"></script>
+  
+  <script type="text/babel">
+    AOS.init();
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('three-container').appendChild(renderer.domElement);
+    
+    const geometryOptions = [
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.SphereGeometry(1, 32, 32),
+      new THREE.ConeGeometry(1, 2, 32),
+      new THREE.TorusGeometry(1, 0.4, 16, 100),
+      new THREE.TetrahedronGeometry(1),
+    ];
+    
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    const shape = new THREE.Mesh(geometryOptions[0], material);
+    scene.add(shape);
+    
+    camera.position.z = 5;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      shape.rotation.x += 0.01;
+      shape.rotation.y += 0.01;
+      shape.position.y = Math.sin(Date.now() * 0.001) * 0.5;
+      renderer.render(scene, camera);
+    }
+
+    function switchShape() {
+      shape.geometry.dispose();
+      shape.geometry = geometryOptions[(Math.floor(Math.random() * geometryOptions.length))];
+    }
+
+    setInterval(switchShape, 3000);
+    animate();
+
+    function generateRandomLetter() {
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      return letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+
+    function displayHackerText() {
+      const hackerTextDiv = document.querySelector('.hacker-text');
+      let randomText = '';
+      for (let i = 0; i < 1000; i++) {
+        randomText += generateRandomLetter() + ' ';
+      }
+      hackerTextDiv.textContent = randomText;
+    }
+
+    displayHackerText();
+  </script>
+</body>
+</html>
